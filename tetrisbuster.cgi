@@ -21,28 +21,27 @@ board_width = 10
 
 def canPutPiece(board, piece, left, top, rot):
 	new_board = board[:]
-	
+
 	for y in range(4):
 		for x in range(4):
 			bx = left+x
 			by = top+y
-			
-			
+
+
 			if pieces[piece][rot][y][x]:
 				if by >= board_height or bx >= board_width or \
 				bx < 0 or by < 0 or board[by][bx] != '.':
 					return (board, False,) # illegal move
-				else:
-					row = list(new_board[by])
-					row[bx] = piece
-					new_board[by] = ''.join(row)
+				row = list(new_board[by])
+				row[bx] = piece
+				new_board[by] = ''.join(row)
 
 	return (new_board, True,) # legal move
 
 def doMove(board, piece, position, rot):
 	# put piece at top of board
 	y = 0
-		
+
 	# move piece down until we can't anymore
 	new_board = board[:]
 	while True:
@@ -50,21 +49,16 @@ def doMove(board, piece, position, rot):
 		new_board, legal = canPutPiece(board, piece, position, y, rot)
 		if not legal:
 			break
-		
+
 		y += 1
-	
+
 	# delete complete rows
 	ret_board = filter(lambda row: any(item == '.' for item in row), ret_board)
-	for i in range(board_height-len(ret_board)):
+	for _ in range(board_height-len(ret_board)):
 		ret_board.insert(0, '.' * board_width)
-	
-	
-	if y == 0:
-		# cannot place piece; return illegal move
-		return (board, False,)
-	else:
-		# put the changes into board
-		return (ret_board, True,) # 'True' - move is legal
+
+
+	return (board, False) if y == 0 else (ret_board, True)
 
 form = cgi.FieldStorage()
 if form.has_key("piece") and form.has_key("board"):
